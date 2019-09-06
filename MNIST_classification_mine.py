@@ -1,42 +1,43 @@
 """
-Trains a simple neural network on MNIST classification, using my implementation.
+Trains a simple Extreme Learning Machine on MNIST classification, using my implementation.
 """
 
 from data.fashion_MNIST import *
-from helper.NN import *
+from ELM import ELM
 from helper.activations import *
-from helper.losses import *
 import numpy as np
-import warnings
 
-np.seterr(all='warn')
-warnings.filterwarnings('error')
-def train_model(id):
+def train_model():
     data = load_data()
     (x_train, y_train), (x_test, y_test) = prepare_data_for_tooc(data)
  
-    batch_size = 1
-    epochs = 30
-    lr = 1
-    r = 0.0000
+    num_neurons = 2000
 
-    mse = MeanSquaredCost()
+    model = ELM(784, num_neurons, 10, sigmoid_activation)
 
-    classifier = SimpleNeuronalNetwork((784, 20, 10), sigmoid_activation, sigmoid_derivation, mse)
+    model.train(x_train, y_train)
+    
 
-    for e in range(epochs):
-        for b in range(x_train.shape[0] // batch_size):
-            for s in range(batch_size):
-                classifier.train_network(x_train[b * batch_size + s], y_train[b * batch_size + s])
-            classifier.apply_changes(lr, r)
+    # evaluate training accuracy
 
-        accuracy = 0        
+    train_accuracy = 0
 
-        for s in range(x_train.shape[0]):
-            output = classifier.get_output(x_train[s, :])
-            if np.argmax(output) == np.argmax(y_train[s, : ]):
-                accuracy += 1            
+    for s in range(x_train.shape[0]):
+        output = model.get_output(x_train[s, :])
+        if np.argmax(output) == np.argmax(y_train[s, : ]):
+            train_accuracy += 1            
 
-        print(accuracy / x_train.shape[0], flush = True)
+    print(train_accuracy / x_train.shape[0], flush = True)
 
-train_model(1)
+    # evaluate test accuracy
+
+    test_accuracy = 0
+
+    for s in range(x_test.shape[0]):
+        output = model.get_output(x_test[s, :])
+        if np.argmax(output) == np.argmax(y_test[s, : ]):
+            test_accuracy += 1            
+
+    print(test_accuracy / x_test.shape[0], flush = True)
+
+train_model()
