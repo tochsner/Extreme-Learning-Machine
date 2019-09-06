@@ -16,7 +16,6 @@ def train_model():
     model = ELM(784, num_neurons, 10, sigmoid_activation)
 
     model.train(x_train, y_train)
-    
 
     # evaluate training accuracy
 
